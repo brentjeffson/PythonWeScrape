@@ -1,0 +1,52 @@
+from dataclasses import dataclass, field
+from typing import List
+from enum import Enum
+
+class Website(Enum):
+    BOXNOVELCOM: 'boxnovel.com/'
+
+class Status(Enum):
+    ONGOING: 0
+    COMPLETED: 1
+    HIATUS: 2
+
+@dataclass
+class Entity:
+    id: int
+    title: str
+    url: str
+
+@dataclass
+class Item:
+    name: str
+    value: str
+
+@dataclass 
+class Selector(Item):
+    pass
+
+@dataclass
+class Author(Item):
+    pass
+
+@dataclass
+class Genre(Item):
+    pass
+
+@dataclass
+class Meta:
+    status: Status = None
+    authors: List[Author] = field(default_factory=list)
+    genres: List[Genre] = field(default_factory=list)
+    rating: float = None
+    release: str = None
+
+@dataclass
+class Chapter(Entity):
+    chapter_no: float
+    content: str = None
+
+@dataclass
+class Novel(Entity):
+    meta: Meta = None
+    chapter: List[Chapter] = field(default_factory=list)
