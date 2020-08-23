@@ -64,3 +64,34 @@ class BaseParser:
 
     def parse_content(self, soup: BeautifulSoup) -> str:
         return '\n'.join(self._parse_list_element_text(soup, self.__selectors.content))
+
+class WuxiaWorldCo(BaseParser):
+    SELECTORS = Selectors(
+        title='div.book-info > div.book-name',
+        chapters='a.chapter-item', 
+        content='div.chapter-entity',
+        authors='div.author > span.name', 
+        genres='div.book-catalog > span.txt',
+        description='div.content > p.desc', 
+        rating='span.score', 
+        status='div.book-state > span.txt',
+        release_date=''
+    )
+
+    def __init__(self):
+        super(WuxiaWorldCo, self).__init__(self.SELECTORS)
+
+    def parse_chapters(self, soup: BeautifulSoup) -> List:
+        chapters = super().parse_chapters(soup)
+        # reverse order from descending to ascending
+        chapters = chapters[::-1]
+        return chapters
+
+    def parse_content(self, soup: BeautifulSoup) -> str:
+        content_element = soup.select_one(self.SELECTORS.content)
+        content = content_element.text\
+            .replace('(adsbygoogle = window.adsbygoogle || []).push({});', '') \
+            .replace('\r\n', '').replace('  ', '').replace('\n\n\n', '').replace('\n\n\n\n', '')
+            # .replace('\r\n', '').replace(' ' * 24, '').replace('<br/>', '\n')
+
+        return content
