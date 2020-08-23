@@ -14,9 +14,13 @@ class BaseParser:
         elif Website.BOXNOVELCOM.value in url:
             website = Website.BOXNOVELCOM
         return website
+    
+    def parse_title(self, soup: BeautifulSoup) -> str:
+        title = self._parse_element_text(soup, self.__selectors.title)
+        title = title.replace('\n', '').replace('\r', '').replace('\t', '').strip()
+        return title
 
     def parse_meta(self, soup: BeautifulSoup) -> Meta:
-        title = self._parse_element_text(soup, self.__selectors.title)
         authors = self._parse_list_element_text(soup, self.__selectors.authors)
         genres = self._parse_list_element_text(soup, self.__selectors.genres)
         description = self._parse_element_text(soup, self.__selectors.description)
@@ -95,3 +99,39 @@ class WuxiaWorldCo(BaseParser):
             # .replace('\r\n', '').replace(' ' * 24, '').replace('<br/>', '\n')
 
         return content
+    
+class BoxNovelCom(BaseParser):
+    SELECTORS = Selectors(
+        title='ol.breadcrumb > li:last-child',
+        chapters='li.wp-manga-chapter > a', 
+        content='div.cha-words p ::: div.text-left > p',
+        authors='div.author-content > a', 
+        genres='div.genres-content',
+        description='div#editdescription', 
+        rating='div.post-total-rating > span.total_votes',
+        status='div.post-status > div:nth-child(2) > div:last-child',
+        release_data='div.post-status > div:nth-child(1) > div:last-child'
+    )
+
+    def __init__(self):
+        super(BoxNovelCom, self).__init__(self.SELECTORS)
+
+    def parse_meta(self, soup: BeautifulSoup) -> Meta:
+        meta =  super().parse_meta(soup)
+        meta.genres = [genre.replace('\n', '') for genre in meta.genres]
+        meta.authors = [author.replace('\n', '') for author in meta.authors]
+        meta.description = meta.description[1:]
+        return meta
+
+    def parse_chapters(self, soup: BeautifulSoup) -> List[Chapter]:
+        chapters = super().parse_chapters(soup)
+        for chapter in chapters:
+            chapter.title = chapter.title.replace('\t', '').replace('\n', '').strip()
+        return chapters
+
+    def parse_content(self, soup: BeautifulSoup) -> str:
+        paragraph_elements = soup.select(self.SELECTORS.content.split(':::')[0].strip())
+        if len(paragraph_elements) == 0:
+            paragraph_elements = soup.select(self.SELECTORS.content.split(':::')[1].strip())
+        content_list = [element.text for element in paragraph_elements]
+        return '\n\n'.join(content_list)
