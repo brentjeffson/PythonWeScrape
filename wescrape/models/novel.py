@@ -3,7 +3,8 @@ from typing import List
 from enum import Enum
 
 class Website(Enum):
-    BOXNOVELCOM: 'boxnovel.com/'
+    BOXNOVELCOM: 'boxnovel.com'
+    WUXIAWORLDCO: 'wuxiaworld.co'
 
 class Status(Enum):
     ONGOING: 0
@@ -26,6 +27,18 @@ class Selector(Item):
     pass
 
 @dataclass
+class Selectors:
+    title: str
+    chapters: str
+    content: str
+    authors: str
+    genres: str
+    description: str
+    rating: str
+    status: str
+    release_date: str
+
+@dataclass
 class Author(Item):
     pass
 
@@ -35,15 +48,14 @@ class Genre(Item):
 
 @dataclass
 class Meta:
-    status: Status = None
-    authors: List[Author] = field(default_factory=list)
-    genres: List[Genre] = field(default_factory=list)
+    authors: List[str] = field(default_factory=list)
+    genres: List[str] = field(default_factory=list)
     rating: float = None
-    release: str = None
+    release_date: str = None
+    status: Status = None
 
 @dataclass
 class Chapter(Entity):
-    chapter_no: float
     content: str = None
 
 @dataclass
