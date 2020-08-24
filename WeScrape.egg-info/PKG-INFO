@@ -1,0 +1,27 @@
+Metadata-Version: 2.1
+Name: WeScrape
+Version: 0.1
+Summary: Collection of anime, novel, manga, and youtube parsers.
+Home-page: UNKNOWN
+Author: Brent Jeffson F. Florendo
+Author-email: brentjeffson@gmail.com
+License: MIT
+Description: # WeScrape
+        
+        - [WeScrape](#wescrape)
+          - [Introduction](#introduction)
+          - [Usage](#usage)
+        
+        ## Introduction
+        
+        A collection of parser for parsing **Anime**, **Novel**, **Manga**, and **Youtube**.
+        
+        ## Usage
+        
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: ~=3.7
+Description-Content-Type: text/markdown

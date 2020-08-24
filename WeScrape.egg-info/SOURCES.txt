@@ -1,0 +1,7 @@
+README.md
+setup.py
+WeScrape.egg-info/PKG-INFO
+WeScrape.egg-info/SOURCES.txt
+WeScrape.egg-info/dependency_links.txt
+WeScrape.egg-info/requires.txt
+WeScrape.egg-info/top_level.txt
