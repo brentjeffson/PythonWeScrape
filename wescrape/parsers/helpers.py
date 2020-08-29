@@ -1,6 +1,6 @@
 from wescrape.models.novel import Website
 
-def identify(url):
+def identify_parser(url):
     """Identifies `URL` where it comes from"""
     website = None
     if Website.WUXIAWORLDCO.value in url:
