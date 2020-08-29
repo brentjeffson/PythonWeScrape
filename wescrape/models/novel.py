@@ -63,4 +63,4 @@ class Chapter(Entity):
 class Novel(Entity):
     thumbnail: str
     meta: Meta = None
-    chapter: List[Chapter] = field(default_factory=list)
+    chapters: List[Chapter] = field(default_factory=list)
