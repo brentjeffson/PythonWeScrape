@@ -1,20 +1,10 @@
-from wescrape.models.novel import Selectors, Status, Website, Meta
+from wescrape.models.novel import Selectors, Status, Meta
 from bs4 import BeautifulSoup
 
 class BaseParser:
     
     def __init__(self, selectors: Selectors):
         self.__selectors = selectors
-
-    @staticmethod
-    def identify(url):
-        """Identifies `URL` where it comes from"""
-        website = None
-        if Website.WUXIAWORLDCO.value in url:
-            website = Website.WUXIAWORLDCO
-        elif Website.BOXNOVELCOM.value in url:
-            website = Website.BOXNOVELCOM
-        return website
     
     def parse_title(self, soup: BeautifulSoup) -> str:
         title = self._parse_element_text(soup, self.__selectors.title)
