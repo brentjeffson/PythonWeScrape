@@ -29,6 +29,7 @@ class Selector(Item):
 @dataclass
 class Selectors:
     title: str
+    thumbnail: str
     chapters: str
     content: str
     authors: str
@@ -60,5 +61,6 @@ class Chapter(Entity):
 
 @dataclass
 class Novel(Entity):
+    thumbnail: str
     meta: Meta = None
     chapter: List[Chapter] = field(default_factory=list)
