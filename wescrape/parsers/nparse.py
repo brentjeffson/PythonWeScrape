@@ -2,7 +2,7 @@ from wescrape.models.novel import Selectors, Status, Meta, Chapter, Novel
 from typing import List
 from bs4 import BeautifulSoup
 
-class BaseParser:
+class NovelBaseParser:
     
     def __init__(self, selectors: Selectors):
         self.__selectors = selectors
@@ -76,7 +76,7 @@ class BaseParser:
     def get_content(self, soup: BeautifulSoup) -> str:
         return "\n".join(self._parse_list_element_text(soup, self.__selectors.content))
 
-class WuxiaWorldCo(BaseParser):
+class WuxiaWorldCo(NovelBaseParser):
     SELECTORS = Selectors(
         title="div.book-info > div.book-name",
         thumbnail="div.book-img > img",
@@ -108,7 +108,7 @@ class WuxiaWorldCo(BaseParser):
 
         return content
     
-class BoxNovelCom(BaseParser):
+class BoxNovelCom(NovelBaseParser):
     SELECTORS = Selectors(
         title="ol.breadcrumb > li:last-child",
         thumbnail="div.summary_image > a > img",
