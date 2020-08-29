@@ -54,6 +54,7 @@ class Meta:
     rating: float = None
     release_date: str = None
     status: Status = None
+    description: str = None
 
 @dataclass
 class Chapter(Entity):
