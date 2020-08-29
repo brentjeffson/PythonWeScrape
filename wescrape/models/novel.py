@@ -3,13 +3,13 @@ from typing import List
 from enum import Enum
 
 class Website(Enum):
-    BOXNOVELCOM: 'boxnovel.com'
-    WUXIAWORLDCO: 'wuxiaworld.co'
+    BOXNOVELCOM = 'boxnovel.com'
+    WUXIAWORLDCO = 'wuxiaworld.co'
 
 class Status(Enum):
-    ONGOING: 0
-    COMPLETED: 1
-    HIATUS: 2
+    ONGOING = 0
+    COMPLETED = 1
+    HIATUS = 2
 
 @dataclass
 class Entity:
