@@ -102,7 +102,7 @@ class BoxNovelCom(BaseParser):
         description='div#editdescription', 
         rating='div.post-total-rating > span.total_votes',
         status='div.post-status > div:nth-child(2) > div:last-child',
-        release_data='div.post-status > div:nth-child(1) > div:last-child'
+        release_date='div.post-status > div:nth-child(1) > div:last-child'
     )
 
     def __init__(self):
