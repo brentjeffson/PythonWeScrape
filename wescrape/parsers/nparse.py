@@ -1,4 +1,5 @@
-from wescrape.models.novel import Selectors, Status, Meta
+from wescrape.models.novel import Selectors, Status, Meta, Chapter
+from typing import List
 from bs4 import BeautifulSoup
 
 class BaseParser:
