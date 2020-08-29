@@ -1,6 +1,7 @@
 from wescrape.models.novel import Selectors, Status, Meta, Chapter, Novel
 from typing import List
 from bs4 import BeautifulSoup
+import re
 
 class NovelBaseParser:
     
@@ -19,17 +20,17 @@ class NovelBaseParser:
         )
     
     def get_title(self, soup: BeautifulSoup) -> str:
-        title = self._parse_element_text(soup, self.__selectors.title)
+        title = self._get_element_text(soup, self.__selectors.title)
         title = title.replace("\n", "").replace("\r", "").replace("\t", "").strip()
         return title
 
     def get_meta(self, soup: BeautifulSoup) -> Meta:
-        authors = self._parse_list_element_text(soup, self.__selectors.authors)
-        genres = self._parse_list_element_text(soup, self.__selectors.genres)
-        description = self._parse_element_text(soup, self.__selectors.description)
-        rating = float(self._parse_element_text(soup, self.__selectors.rating))
-        release_date = self._parse_element_text(soup, self.__selectors.release_date)
-        status = self._parse_element_text(soup, self.__selectors.status).lower()
+        authors = self._get_list_element_text(soup, self.__selectors.authors)
+        genres = self._get_list_element_text(soup, self.__selectors.genres)
+        description = self._get_element_text(soup, self.__selectors.description)
+        rating = float(self._get_element_text(soup, self.__selectors.rating))
+        release_date = self._get_element_text(soup, self.__selectors.release_date)
+        status = self._get_element_text(soup, self.__selectors.status).lower()
         if status == Status.ONGOING.name.lower():
             status = Status.ONGOING
         elif status == Status.COMPLETED.name.lower():
@@ -40,24 +41,10 @@ class NovelBaseParser:
             authors=authors,
             genres=genres,
             rating=rating,
-            release_date=release_data,
-            status=status
+            release_date=release_date,
+            status=status,
+            description=description
         )
-
-    def _get_element_attr(self, soup, selector) -> str:
-        element = soup.select_one(selector)
-        return element["src"]
-
-    def _get_element_text(self, soup, selector) -> str:
-        element = soup.select_one(selector)
-        return element.text
-
-    def _get_list_element_text(self, soup, selector) -> List:
-        elements = soup.select(selector)
-        items = []
-        for element in elements:
-            items.append(element.text)
-        return items
 
     def get_chapters(self, soup: BeautifulSoup) -> List[Chapter]:
         chapter_elements = soup.select(self.__selectors.chapters)
@@ -74,7 +61,22 @@ class NovelBaseParser:
         return chapters
 
     def get_content(self, soup: BeautifulSoup) -> str:
-        return "\n".join(self._parse_list_element_text(soup, self.__selectors.content))
+        return "\n".join(self._get_list_element_text(soup, self.__selectors.content))
+
+    def _get_element_attr(self, soup, selector) -> str:
+        element = soup.select_one(selector)
+        return element["src"]
+
+    def _get_element_text(self, soup, selector) -> str:
+        element = soup.select_one(selector)
+        return element.text
+
+    def _get_list_element_text(self, soup, selector) -> List:
+        elements = soup.select(selector)
+        items = []
+        for element in elements:
+            items.append(element.text)
+        return items
 
 class WuxiaWorldCo(NovelBaseParser):
     SELECTORS = Selectors(
@@ -94,7 +96,7 @@ class WuxiaWorldCo(NovelBaseParser):
         super(WuxiaWorldCo, self).__init__(self.SELECTORS)
 
     def get_chapters(self, soup: BeautifulSoup) -> List:
-        chapters = super().parse_chapters(soup)
+        chapters = super().get_chapters(soup)
         # reverse order from descending to ascending
         chapters = chapters[::-1]
         return chapters
@@ -126,14 +128,14 @@ class BoxNovelCom(NovelBaseParser):
         super(BoxNovelCom, self).__init__(self.SELECTORS)
 
     def get_meta(self, soup: BeautifulSoup) -> Meta:
-        meta =  super().parse_meta(soup)
+        meta =  super().get_meta(soup)
         meta.genres = [genre.replace("\n", "") for genre in meta.genres]
         meta.authors = [author.replace("\n", "") for author in meta.authors]
         meta.description = meta.description[1:]
         return meta
 
     def get_chapters(self, soup: BeautifulSoup) -> List[Chapter]:
-        chapters = super().parse_chapters(soup)
+        chapters = super().get_chapters(soup)
         for chapter in chapters:
             chapter.title = chapter.title.replace("\t", "").replace("\n", "").strip()
         return chapters
