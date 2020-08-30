@@ -1,10 +1,11 @@
 from wescrape.models.novel import Website
+from wescrape.parsers.nparse import BoxNovelCom, WuxiaWorldCo
 
 def identify_parser(url):
-    """Identifies `URL` where it comes from"""
-    website = None
+    """Identifies `URL` and return required parser"""
+    parser = None
     if Website.WUXIAWORLDCO.value in url:
-        website = Website.WUXIAWORLDCO
+        parser = WuxiaWorldCo()
     elif Website.BOXNOVELCOM.value in url:
-        website = Website.BOXNOVELCOM
-    return website
+        parser = BoxNovelCom()
+    return parser
