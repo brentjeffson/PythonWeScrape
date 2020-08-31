@@ -10,6 +10,7 @@ class Status(Enum):
     ONGOING = 0
     COMPLETED = 1
     HIATUS = 2
+    UPDATING = 3
 
 @dataclass
 class Entity:
