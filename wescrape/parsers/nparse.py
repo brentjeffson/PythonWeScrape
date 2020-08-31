@@ -54,7 +54,7 @@ class NovelBaseParser:
             chapter_id = re.findall("([\d\.]+)", chapter_title)[0]
             chapter_url = element["href"]
             chapters.append(Chapter(
-                id=int(chapter_id), 
+                id=chapter_id, 
                 title=chapter_title, 
                 url=chapter_url
             ))
