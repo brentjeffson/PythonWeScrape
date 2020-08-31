@@ -14,7 +14,7 @@ class Status(Enum):
 
 @dataclass
 class Entity:
-    id: int
+    id: str
     title: str
     url: str
 
