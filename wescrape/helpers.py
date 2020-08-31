@@ -15,3 +15,12 @@ def identify_parser(url):
 
 def identify_status(status: str) -> Status:
     """Identify string status, return corresponding Status object"""
+    if status == Status.ONGOING.name.lower():
+        status = Status.ONGOING
+    elif status == Status.COMPLETED.name.lower():
+        status = Status.COMPLETED
+    elif status == Status.HIATUS.name.lower():
+        status = Status.HIATUS
+    else:
+        status = Status.UPDATING
+    return status
