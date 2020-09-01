@@ -14,7 +14,6 @@ class Status(Enum):
 
 @dataclass
 class Entity:
-    id: str
     title: str
     url: str
 
@@ -59,6 +58,7 @@ class Meta:
 
 @dataclass
 class Chapter(Entity):
+    id: str
     content: str = None
 
 @dataclass
