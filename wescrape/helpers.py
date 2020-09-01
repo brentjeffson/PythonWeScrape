@@ -1,9 +1,9 @@
-from wescrape.models.novel import Status
-from wescrape.models.novel import Website
-from wescrape.parsers.nparse import BoxNovelCom, WuxiaWorldCo
+from bs4 import BeautifulSoup
+from wescrape.models.novel import Website, Status
+from wescrape.parsers.nparse import NovelBaseParser, BoxNovelCom, WuxiaWorldCo
 
 
-def identify_parser(url):
+def identify_parser(url: str) -> NovelBaseParser:
     """Identifies `URL` and return required parser"""
     parser = None
     if Website.WUXIAWORLDCO.value in url:
@@ -21,4 +21,9 @@ def identify_status(status: str) -> Status:
             status = Status(key)
             return status
     return Status.UPDATING
+
+
+def parse_markup(markup: str, parser="html.parser") -> BeautifulSoup:
+    soup = BeautifulSoup(markup, features=parser)
+    return soup
     
