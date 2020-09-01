@@ -11,7 +11,6 @@ class NovelBaseParser:
     def get_novel(self, soup: BeautifulSoup) -> Novel:
         thumbnail = self._get_element_attr(soup, self.__selectors.thumbnail)
         return Novel(
-            id=-1,
             url="",
             title=self.get_title(soup),
             thumbnail=thumbnail,
