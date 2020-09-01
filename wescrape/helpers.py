@@ -34,7 +34,7 @@ def search(session: requests.Session, keyword: str, website: Website) -> [Novel]
     if website == Website.BOXNOVELCOM:
         payload = {
             "action": "wp-manga-search-manga",
-            "title": self.search_input.text
+            "title": keyword
         }
         resp = session.post("https://boxnovel.com/wp-admin/admin-ajax.php", data=payload)
         if resp.ok:
