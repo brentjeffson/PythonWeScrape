@@ -40,7 +40,6 @@ def search(session: requests.Session, keyword: str, website: Website) -> [Novel]
         if resp.ok:
             for novel in resp.json()["data"]:
                 novels.append(Novel(
-                    id=novel["url"],
                     title=novel["title"],
                     url=novel["url"],
                     thumbnail=""
