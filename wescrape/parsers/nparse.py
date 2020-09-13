@@ -8,10 +8,10 @@ class NovelBaseParser:
     def __init__(self, selectors: Selectors):
         self.__selectors = selectors
 
-    def get_novel(self, soup: BeautifulSoup) -> Novel:
+    def get_novel(self, url: str, soup: BeautifulSoup) -> Novel:
         thumbnail = self._get_element_attr(soup, self.__selectors.thumbnail)
         return Novel(
-            url="",
+            url=url,
             title=self.get_title(soup),
             thumbnail=thumbnail,
             meta=self.get_meta(soup),
@@ -30,9 +30,9 @@ class NovelBaseParser:
         rating = float(self._get_element_text(soup, self.__selectors.rating))
         release_date = self._get_element_text(soup, self.__selectors.release_date)
         status = self._get_element_text(soup, self.__selectors.status).lower()
-        if status == Status.ONGOING.name.lower():
+        if status in Status.ONGOING.name.lower():
             status = Status.ONGOING
-        elif status == Status.COMPLETED.name.lower():
+        elif status in Status.COMPLETED.name.lower():
             status = Status.COMPLETED
         else:
             status = Status.HIATUS
@@ -67,8 +67,12 @@ class NovelBaseParser:
         return element["src"]
 
     def _get_element_text(self, soup, selector) -> str:
-        element = soup.select_one(selector)
-        return element.text
+        selectors = [s.strip() for s in selector.split("::")]  
+        for selector in selectors:
+            element = soup.select_one(selector)
+            if element:
+                break
+        return element.text if element else ""
 
     def _get_list_element_text(self, soup, selector) -> List:
         elements = soup.select(selector)
@@ -114,10 +118,10 @@ class BoxNovelCom(NovelBaseParser):
         title="ol.breadcrumb > li:last-child",
         thumbnail="div.summary_image > a > img",
         chapters="li.wp-manga-chapter > a", 
-        content="div.cha-words p ::: div.text-left > p",
+        content="div.cha-words p :: div.text-left > p",
         authors="div.author-content > a", 
         genres="div.genres-content",
-        description="div#editdescription", 
+        description="div#editdescription :: .c_000", 
         rating="div.post-total-rating > span.total_votes",
         status="div.post-status > div:nth-child(2) > div:last-child",
         release_date="div.post-status > div:nth-child(1) > div:last-child"
@@ -128,9 +132,10 @@ class BoxNovelCom(NovelBaseParser):
 
     def get_meta(self, soup: BeautifulSoup) -> Meta:
         meta =  super().get_meta(soup)
-        meta.genres = [genre.replace("\n", "") for genre in meta.genres]
-        meta.authors = [author.replace("\n", "") for author in meta.authors]
-        meta.description = meta.description[1:]
+        meta.release_date = meta.release_date.replace("\n", "").strip()
+        meta.genres = [genre.replace("\n", "").strip() for genre in meta.genres]
+        meta.authors = [author.replace("\n", "").strip() for author in meta.authors]
+        meta.description = meta.description.strip()
         return meta
 
     def get_chapters(self, soup: BeautifulSoup) -> List[Chapter]:
@@ -140,8 +145,8 @@ class BoxNovelCom(NovelBaseParser):
         return chapters
 
     def get_content(self, soup: BeautifulSoup) -> str:
-        paragraph_elements = soup.select(self.SELECTORS.content.split(":::")[0].strip())
+        paragraph_elements = soup.select(self.SELECTORS.content.split("::")[0].strip())
         if len(paragraph_elements) == 0:
-            paragraph_elements = soup.select(self.SELECTORS.content.split(":::")[1].strip())
+            paragraph_elements = soup.select(self.SELECTORS.content.split("::")[1].strip())
         content_list = [element.text for element in paragraph_elements]
         return "\n\n".join(content_list)
