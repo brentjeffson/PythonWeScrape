@@ -28,14 +28,14 @@ class YoutubeParser:
     @staticmethod
     def parse_sources(markup, parser='html.parser'):
 
-        def clean(format_text):
+        def clean(sources):
             """Clean raw source"""
             while True:
-                res = re.search(r'"mimeType":"([\w/]+); codecs=("[\w.,\s]+")","bitrate"', format_text)
+                res = re.search(r'"mimeType":"([\w/]+); codecs=("[\w.,\s]+")","bitrate"', sources)
                 if res is None:
                     break
-                format_text = format_text.replace(res.groups()[1], res.groups()[1].replace("\"", ""))
-            return format_text
+                sources = sources.replace(res.groups()[1], res.groups()[1].replace("\"", ""))
+            return sources
 
         # find script containing video informations
         soup = BeautifulSoup(markup, parser)
