@@ -101,26 +101,44 @@ class YoutubeParser:
 
     @staticmethod
     def classify_sources(sources):
-            """Classifies sources"""
-            categories = {
-                'video': [],
-                'audio': [],
-                'video_audio': [],
-                'uncategorized': []
-            }
-            for s in sources:
-                mime = s['mimeType']
-                split_mime = mime.split(';')
+        """Classifies sources"""
+        categories = {
+            'video': [],
+            'audio': [],
+            'video_audio': [],
+            'uncategorized': []
+        }
+        sources = YoutubeParser.sort(sources)
+        for s in sources:
+            mime = s['mimeType']
+            split_mime = mime.split(';')
+            
+            if len(split_mime[1].split(',')) > 1:
+                categories['video_audio'].append(s)
+            elif 'video' in mime:
+                categories['video'].append(s)
+            elif 'audio' in mime:
+                categories['audio'].append(s)
+            else:
+                categories['uncategorized'].append(s)
+        return categories
+
+    def sort(sources):
+        sorted_sources = sources.copy()
+        for idy in range(len(sorted_sources)):
+            
+            for idx in range(len(sorted_sources)):
                 
-                if len(split_mime[1].split(',')) > 1:
-                    categories['video_audio'].append(s)
-                elif 'video' in mime:
-                    categories['video'].append(s)
-                elif 'audio' in mime:
-                    categories['audio'].append(s)
-                else:
-                    categories['uncategorized'].append(s)
-            return categories
+                if idx+1 < len(sorted_sources):
+                    
+                    if 'contentLength' in sorted_sources[idx].keys() \
+                        and 'contentLength' in sorted_sources[idx+1].keys():
+                        
+                        if int(sorted_sources[idx]['contentLength']) > int(sorted_sources[idx+1]['contentLength']):    
+                            temp = sorted_sources[idx]
+                            sorted_sources[idx] = sorted_sources[idx+1]
+                            sorted_sources[idx+1] = temp
+        return sorted_sources
 
     @staticmethod
     def list_sources(sources):
