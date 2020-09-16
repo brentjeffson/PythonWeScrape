@@ -3,6 +3,25 @@ import re
 import json
 
 
+class Youtube:
+    
+    def __init__(self, markup):
+        self.__markup = markup
+        self.__sources = YoutubeParser.parse_sources(markup)
+
+    def show_list(self):
+        YoutubeParser.list_sources(self.__sources)
+    
+    def source(self, itag):         
+        for source in self.__sources:
+            if source['itag'] == itag:
+                return source
+        return {}
+
+    @property
+    def sources(self):
+        return self.__sources
+
     
 class YoutubeParser:
 
@@ -46,11 +65,39 @@ class YoutubeParser:
         try:           
             sources.extend(json.loads(format_sources))
             sources.extend(json.loads(adaptive_format_sources))
+            for i in range(len(sources)):
+                sources[i]['url'] = YoutubeParser.parse_url(sources[i]['url'])
         except Exception as ex:
             print(ex)
             print('Error: Invalid Format')
         finally:
             return sources
+
+    @staticmethod
+    def parse_url(url):
+        encoding = (
+            ('20', ' '),
+            ('21', '!'),
+            ('22', '"'),
+            ('23', '#'),
+            ('24', '$'),
+            ('25', '%'),
+            ('26', '&'),
+            ('27', '\''),
+            ('28', '('),
+            ('29', ')'),
+            ('2A', '*'),
+            ('2B', '+'),
+            ('2C', ','),
+            ('2D', '-'),
+            ('2E', '.'),
+            ('2F', '/'),
+            ('3D', '='),
+            ('3F', '?'),
+        )
+        for e in encoding:
+            url = url.replace(f'%{e[0]}', e[1])
+        return url
 
     @staticmethod
     def classify_sources(sources):
