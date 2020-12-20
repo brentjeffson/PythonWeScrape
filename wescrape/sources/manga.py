@@ -17,3 +17,21 @@ MANGAKATANA = {
         upload_date =  r'(\w{3})-(\d{2})-(\d{4})'
     )
 }
+
+FANFOX = {
+    'selectors': Selector(
+        title = 'div.detail-info p > span:nth-child(1)',
+        alt_titles = '',
+        authors = 'p.detail-info-right-say > a',
+        genres = 'p.detail-info-right-tag-list > a',
+        rating = 'div.detail-info p > span:nth-child(3) > span.item-score',
+        description = 'p.detail-info-right-content',
+        status = 'div.detail-info p > span:nth-child(2)',
+        chapter = 'div#chapterlist li > a',
+        upload_date = 'div#chapterlist li > a p:nth-child(2)'
+    ),
+    'patterns': Pattern(
+        index = r'[a-zA-Z.\s1-9]+[\s.]?[a-zA-Z]+[\s.]?([\d.]+)\s?\-?\s?[\w\d]+',
+        upload_date =  r'(\w{3})\s?(\d{2}),?\s?(\d{4})'
+    )
+}

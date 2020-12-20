@@ -78,7 +78,7 @@ class MangaParser(BaseParser):
                         elif len(str(res.groups()[0])) == 4:
                             year, month, day = res.groups()
                         
-                        month = month.index(month) + 1 if type(month) == str else month
+                        month = months.index(month) + 1 if type(month) == str else month
                         month = month[1:] if type(month) == str and month.startswith('0') else month
                         day = day[1:] if type(day) == str and day.startswith('0') else day
 
@@ -121,6 +121,7 @@ class MangaParser(BaseParser):
             index_res = re.search(index_pattern, title)
             if index_res:
                 index = index_res.groups()[0]
+                index = float(index)
             
             upload_date = 0
             if upload_dates and len(upload_dates) == len(chapter_tags):
