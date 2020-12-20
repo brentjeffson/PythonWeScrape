@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 
+
 class BaseParser():
 
     def __init__(self, markup, parser='html.parser'):

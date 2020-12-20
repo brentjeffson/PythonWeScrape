@@ -1,91 +1,11 @@
 import re
 import datetime
+
 from wescrape.parsers.base import BaseParser
-from enum import Enum
-from dataclasses import dataclass, field
-from typing import List
+from wescrape.models.manga import Status, Info, Chapter, Manga
+from wescrape.sources.manga import MANGAKATANA
 
-
-class Status(Enum):
-    ONGOING = 0
-    COMPLETED = 1
-    HIATUS = 2
-    UPDATING = 3
-
-
-@dataclass
-class Selector:
-    title: str
-    alt_titles: str
-    authors: str
-    genres: str
-    rating: str
-    description: str
-    status: str
-    chapter: str
-    upload_date: str
-
-
-@dataclass
-class Pattern:
-    index: str
-    upload_date: str
-
-
-@dataclass
-class Info:
-    alt_titles: List[str]
-    authors: List[str]
-    genres: List[str]
-    rating: float
-    description: str
-    status: Status
-
-
-@dataclass
-class Chapter:
-    url: str
-    title: str
-    index: int
-    timestamp: float = 0
-    content: str = ''
-
-
-@dataclass
-class Manga:
-    url: str
-    title: str
-    info: Info
-    chapters: List[Chapter]
-
-    def __len__(self):
-        return len(self.chapters)
-
-    @classmethod
-    def from_html(cls, markup):
-        parser = MangaParser(markup, 'html.parser')
-        return parser.parse_manga()
-
-
-MANGAKATANA = {
-    'selectors': Selector(
-        title = 'div.info > h1.heading',
-        alt_titles = 'ul.meta > li:nth-child(1) > div:nth-child(2) > div.alt_name',
-        authors = 'ul.meta > li:nth-child(2) > div:nth-child(2) > a',
-        genres = 'ul.meta > li:nth-child(3) > div:nth-child(2) > div.genres > a',
-        rating = '',
-        description = 'div.summary > p',
-        status = 'ul.meta > li:nth-child(4) > div:nth-child(2)',
-        chapter = 'div.chapters div.chapter > a',
-        upload_date = 'div.update_time'
-    ),
-    'patterns': Pattern(
-        index = r'[a-zA-Z\s]+([\d.]*):?[^.]*',
-        upload_date =  r'(\w{3})-(\d{2})-(\d{4})'
-    )
-}
-
-SOURCES = {
+MANGA_SOURCES = {
     'mangakatana.com': MANGAKATANA
 }
 
@@ -97,9 +17,9 @@ class MangaParser(BaseParser):
         self._selector = None
         self._pattern = None
 
-        if super().root_url in SOURCES:
-            self._selector = SOURCES[super().root_url]['selectors']
-            self._pattern = SOURCES[super().root_url]['patterns']
+        if super().root_url in MANGA_SOURCES:
+            self._selector = MANGA_SOURCES[super().root_url]['selectors']
+            self._pattern = MANGA_SOURCES[super().root_url]['patterns']
         else:
             print(f'Unsupported source {super().root_url}')
 
@@ -200,7 +120,7 @@ class MangaParser(BaseParser):
             title = chapter_tag.get_text()
             index_res = re.search(index_pattern, title)
             if index_res:
-                index = index_res.groups(1)
+                index = index_res.groups()[0]
             
             upload_date = 0
             if upload_dates and len(upload_dates) == len(chapter_tags):
