@@ -23,6 +23,12 @@ class MangaParser(BaseParser):
         else:
             print(f'Unsupported source {super().root_url}')
 
+    def _parse_thumbnail(self, soup, selector):
+        thumbnail_tag = soup.select_one(selector)
+        if thumbnail_tag.name == 'img':
+            return thumbnail_tag['src']
+        return None
+        
     def _parse_title(self, soup, selector):
         title_tag = soup.select_one(selector)
         return title_tag.get_text() if title_tag else ''
@@ -86,15 +92,15 @@ class MangaParser(BaseParser):
                     upload_dates.append(timestamp)
         return upload_dates
 
-    def _parse_info(self, alt_titles_sel, authors_sel, genres_sel, 
+    def _parse_info(self, soup, alt_titles_sel, authors_sel, genres_sel, 
         rating_sel, description_sel, status_sel):
 
-        alt_titles = self._parse_alt_titles(self.soup, alt_titles_sel, ';')
-        authors = self._parse_authors(self.soup, authors_sel)
-        genres = self._parse_genres(self.soup, genres_sel)
-        rating = self._parse_rating(self.soup, rating_sel)
-        description = self._parse_description(self.soup, description_sel)
-        status = self._parse_status(self.soup, status_sel)
+        alt_titles = self._parse_alt_titles(soup, alt_titles_sel, ';')
+        authors = self._parse_authors(soup, authors_sel)
+        genres = self._parse_genres(soup, genres_sel)
+        rating = self._parse_rating(soup, rating_sel)
+        description = self._parse_description(soup, description_sel)
+        status = self._parse_status(soup, status_sel)
 
         return Info(
             alt_titles = alt_titles,
@@ -105,11 +111,11 @@ class MangaParser(BaseParser):
             status = status
         )
 
-    def _parse_chapters(self, chapter_sel, upload_date_sel, index_pattern, upload_date_pattern):
-        chapter_tags = super().soup.select(chapter_sel)
+    def _parse_chapters(self, soup, chapter_sel, upload_date_sel, index_pattern, upload_date_pattern):
+        chapter_tags = soup.select(chapter_sel)
 
         upload_dates = self._parse_chapter_timestamps(
-            super().soup,
+            soup,
             upload_date_sel,
             upload_date_pattern
         )
@@ -133,8 +139,10 @@ class MangaParser(BaseParser):
     def parse_manga(self):
 
         url = self.web_url
+        thumbnail = self._parse_thumbnail(super().soup, self._selector.thumbnail)
         title = self._parse_title(super().soup, self._selector.title)
         info = self._parse_info( 
+            super().soup,
             self._selector.alt_titles, 
             self._selector.authors, 
             self._selector.genres, 
@@ -143,10 +151,11 @@ class MangaParser(BaseParser):
             self._selector.status
         )
         chapters = self._parse_chapters(
+            super().soup,
             self._selector.chapter,
             self._selector.upload_date,
             index_pattern = self._pattern.index,
             upload_date_pattern = self._pattern.upload_date
         )
         
-        return Manga(url, title, info, chapters)
+        return Manga(url=url, thumbnail=thumbnail, title=title, info=info, chapters=chapters)
