@@ -12,6 +12,7 @@ class Status(Enum):
 
 @dataclass
 class Selector:
+    thumbnail: str
     title: str
     alt_titles: str
     authors: str
@@ -51,6 +52,7 @@ class Chapter:
 @dataclass
 class Manga:
     url: str
+    thumbnail_url: str
     title: str
     info: Info
     chapters: List[Chapter]
