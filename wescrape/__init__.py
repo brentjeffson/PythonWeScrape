@@ -1,41 +1,52 @@
 from wescrape.parsers.base import BaseParser
-from wescrape.parsers.mparse import MangaParser, MANGA_SOURCES
+from wescrape.models.base import MediaType
 
-from enum import Enum
+from pathlib import Path
+import importlib
 
-class MediaType(Enum):
-    MANGA = 0
-    NOVEL = 1
-    VIDEO = 2
 
 class WeScrape:
 
-    SOURCE_LIST = {
-        MediaType.MANGA: MANGA_SOURCES,
-    }
 
     @staticmethod
-    def identify_media_type(html):
-        base_parser = BaseParser(html)
-        if base_parser.root_url in MANGA_SOURCES:
-            return MediaType.MANGA
-        if base_parser.root_url in NOVEL_SOURCES:
-            return MediaType.NOVEL
-        if base_parser.root_url in VIDEO_SOURCES:
-            return MediaType.VIDEO
+    def identify_parser(html):
+        class_ = None
+        media_type = None
+        root_url = BaseParser(html).root_url
+
+        for media_type in MediaType:
+            source_modules = []
+            for path in Path('wescrape', 'parsers', media_type.name.lower()).iterdir():
+                if not path.name.startswith('_') and path.is_file() and path.suffix == '.py':
+                    source_modules.append(path.stem)
+
+            if len(source_modules) == 0:
+                break
+
+            for source_module in source_modules:
+
+                modules = importlib.import_module(
+                    name=f'.{source_module}',
+                    package=f'wescrape.parsers.{media_type.name.lower()}'
+                )
+
+                source_name = [d for d in dir(modules) if str(d).isupper()]
+                if len(source_name) > 0:
+                    source_name = getattr(modules, source_name[0])
+                else:
+                    source_name = source_module.capitalize()
+                
+                if source_name.lower() in root_url:
+                    class_ = getattr(modules, source_name)
+                    return class_, media_type
+        return None, None
 
     @staticmethod
-    def from_html(html, parser):
-        media_type = WeScrape.identify_media_type(html)
-        
-        if media_type == MediaType.MANGA:
-            parser = MangaParser(html, parser)
-            return parser.parse_manga()
-        
-        if media_type == MediaType.NOVEL:
-            # TODO
-            pass
-        
-        if media_type == MediaType.VIDEO:
-            # TODO YT
-            pass
+    def from_html(html, parser='html.parser'):
+        class_, _ = WeScrape.identify_parser(html)
+        if class_ is None:
+            print('Unsupported website...')
+            return None
+
+        parser = class_(html, parser)
+        return parser.parse()

@@ -1,6 +1,12 @@
 from enum import Enum
 from typing import List
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
+
+class MediaType(Enum):
+    MANGA = 0
+    # NOVEL = 1
+    # VIDEO = 2
 
 
 class Status(Enum):
@@ -11,23 +17,32 @@ class Status(Enum):
 
 
 @dataclass
-class Selector:
-    thumbnail: str
+class Selectors:
     title: str
-    alt_titles: str
-    authors: str
-    genres: str
-    rating: str
-    description: str
-    status: str
     chapter: str
-    upload_date: str
+    chapter_image: str
+    thumbnail: str = ''
+    alt_titles: str = ''
+    authors: str = ''
+    genres: str = ''
+    rating: str = ''
+    description: str = ''
+    status: str = ''
+    upload_date: str = ''
 
 
 @dataclass
-class Pattern:
-    index: str
-    upload_date: str
+class Patterns:
+    index: str = ''
+    upload_date: str = ''
+
+
+@dataclass
+class Source:
+    root_url: str
+    image_base_url: str
+    selectors: Selectors
+    patterns: Patterns
 
 
 @dataclass
@@ -47,6 +62,7 @@ class Chapter:
     index: int
     timestamp: float = 0
     content: str = ''
+    # image_urls: List = field(default_factory=[''])
 
 
 @dataclass

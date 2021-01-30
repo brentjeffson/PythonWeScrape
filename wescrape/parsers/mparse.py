@@ -2,33 +2,26 @@ import re
 import datetime
 
 from wescrape.parsers.base import BaseParser
-from wescrape.models.manga import Status, Info, Chapter, Manga
-from wescrape.sources.manga import MANGAKATANA
+from wescrape.models.base import Status, Info, Chapter, Manga
 
-MANGA_SOURCES = {
-    'mangakatana.com': MANGAKATANA
-}
 
 class MangaParser(BaseParser):
 
-    def __init__(self, markup, parser):
+    def __init__(self, markup, source, parser):
         super().__init__(markup, parser)
 
-        self._selector = None
-        self._pattern = None
+        if self.root_url not in source.root_url:
+            print('Unable to parse markup.')
 
-        if super().root_url in MANGA_SOURCES:
-            self._selector = MANGA_SOURCES[super().root_url]['selectors']
-            self._pattern = MANGA_SOURCES[super().root_url]['patterns']
-        else:
-            print(f'Unsupported source {super().root_url}')
-
+        self._selector = source.selectors
+        self._pattern = source.patterns
+    
     def _parse_thumbnail(self, soup, selector):
         thumbnail_tag = soup.select_one(selector)
         if thumbnail_tag.name == 'img':
             return thumbnail_tag['src']
         return None
-        
+
     def _parse_title(self, soup, selector):
         title_tag = soup.select_one(selector)
         return title_tag.get_text() if title_tag else ''
@@ -36,11 +29,11 @@ class MangaParser(BaseParser):
     def _parse_alt_titles(self, soup, selector, splitter=''):
         alt_titles = super().parse_item_list(soup, selector, splitter)
         return alt_titles
-    
+
     def _parse_authors(self, soup, selector, splitter=''):
         authors = super().parse_item_list(soup, selector, splitter)
         return authors
-    
+
     def _parse_genres(self, soup, selector, splitter=''):
         genres = super().parse_item_list(soup, selector, splitter)
         return genres
@@ -56,7 +49,7 @@ class MangaParser(BaseParser):
         if type(description) == list and len(description) > 1:
             description = '\n'.join(description)
         return description
-    
+
     def _parse_status(self, soup, selector):
         status_tag = soup.select_one(selector)
         status = status_tag.get_text() if status_tag else None
@@ -68,7 +61,7 @@ class MangaParser(BaseParser):
 
     def _parse_chapter_timestamps(self, soup, upload_date_sel, upload_date_pattern):
         months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
         upload_dates = []
         if upload_date_sel:
             upload_tags = soup.select(upload_date_sel)
@@ -103,15 +96,17 @@ class MangaParser(BaseParser):
         status = self._parse_status(soup, status_sel)
 
         return Info(
-            alt_titles = alt_titles,
-            authors = authors,
-            genres = genres,
-            rating = rating,
-            description = description,
-            status = status
+            alt_titles=alt_titles,
+            authors=authors,
+            genres=genres,
+            rating=rating,
+            description=description,
+            status=status
         )
 
-    def _parse_chapters(self, soup, chapter_sel, upload_date_sel, index_pattern, upload_date_pattern):
+    def _parse_chapters(self, soup, chapter_sel, upload_date_sel, 
+        index_pattern, upload_date_pattern):
+
         chapter_tags = soup.select(chapter_sel)
 
         upload_dates = self._parse_chapter_timestamps(
@@ -119,7 +114,7 @@ class MangaParser(BaseParser):
             upload_date_sel,
             upload_date_pattern
         )
-        
+
         chapters = []
         for idx, chapter_tag in enumerate(chapter_tags):
             url = chapter_tag['href']
@@ -128,7 +123,7 @@ class MangaParser(BaseParser):
             if index_res:
                 index = index_res.groups()[0]
                 index = float(index)
-            
+
             upload_date = 0
             if upload_dates and len(upload_dates) == len(chapter_tags):
                 upload_date = upload_dates[idx]
@@ -136,26 +131,43 @@ class MangaParser(BaseParser):
             chapters.append(Chapter(url, title, index, upload_date))
         return chapters
 
-    def parse_manga(self):
-
+    def parse(self):
         url = self.web_url
-        thumbnail = self._parse_thumbnail(super().soup, self._selector.thumbnail)
-        title = self._parse_title(super().soup, self._selector.title)
+        thumbnail = self._parse_thumbnail(super().soup, self.selector.thumbnail)
+        title = self._parse_title(super().soup, self.selector.title)
         info = self._parse_info( 
             super().soup,
-            self._selector.alt_titles, 
-            self._selector.authors, 
-            self._selector.genres, 
-            self._selector.rating, 
-            self._selector.description, 
-            self._selector.status
+            self.selector.alt_titles,
+            self.selector.authors,
+            self.selector.genres,
+            self.selector.rating,
+            self.selector.description,
+            self.selector.status
         )
         chapters = self._parse_chapters(
             super().soup,
-            self._selector.chapter,
-            self._selector.upload_date,
-            index_pattern = self._pattern.index,
-            upload_date_pattern = self._pattern.upload_date
+            self.selector.chapter,
+            self.selector.upload_date,
+            index_pattern=self.pattern.index,
+            upload_date_pattern=self.pattern.upload_date
         )
-        
-        return Manga(url=url, thumbnail=thumbnail, title=title, info=info, chapters=chapters)
+        return Manga(url=url, thumbnail_url=thumbnail, title=title, info=info, chapters=chapters)
+
+    def parse_chapter_images(self, soup):
+        img_urls = []
+
+        chapter_tags = soup.select(self.selector.chapter_image)
+        if chapter_tags:
+            for tag in chapter_tags:
+                if tag.name == 'img':
+                    img_urls.append(tag['src'])
+
+        return img_urls
+
+    @property
+    def selector(self):
+        return self._selector
+
+    @property
+    def pattern(self):
+        return self._pattern

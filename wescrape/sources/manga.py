@@ -1,4 +1,4 @@
-from wescrape.models.manga import Selector, Pattern
+from wescrape.models.base import Selector, Pattern
 
 MANGAKATANA = {
     'selectors': Selector(
@@ -55,7 +55,7 @@ HENTAI2READ = {
         status = 'ul.list.list-simple-mini > li:nth-child(5)',
         chapter = 'ul.nav-chapters div.media > a',
         upload_date = '',
-        chapter_image = ''
+        chapter_image = 'script;2'
     ),
     'patterns': Pattern(
         index = r'[a-zA-Z.\s1-9]+[\s.]?[a-zA-Z]+[\s.]?([\d.]+)\s?\-?\s?[\w\d]+',
