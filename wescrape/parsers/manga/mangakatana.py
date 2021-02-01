@@ -1,4 +1,5 @@
 from wescrape.parsers.mparse import MangaParser
+from wescrape.parsers.base import BaseParser
 from wescrape.models.base import Selectors, Patterns, Source
 import re
 
@@ -31,23 +32,32 @@ class Mangakatana(MangaParser):
     def __init__(self, markup, parser='html.parser'):
         super().__init__(markup, self.SOURCE, parser)
 
-    def parse_chapter_images(self, soup):
-        selector = self.selector.chapter_image
+    @classmethod
+    def parse_chapter(cls, markup):
+        soup = BaseParser(markup).soup
+        image_urls = []
+        selector = cls.SOURCE.selectors.chapter_image
 
         script_tags = soup.find_all(selector)
         script_string = ''
+
+        if len(script_tags) == 0:
+            return image_urls
+
         for tag in script_tags:
             if 'var sv_checked' in str(tag) and 'var ytaw':
                 script_string = str(tag)
                 break
 
-        if script_string:
-            print('Searching script string')
-            pattern = r'var ytaw\s?=\[(.+)\];'
-            res = re.search(pattern, script_string)
+        if script_string == '':
+            return image_urls
 
-            urls = []
-            for string in res.groups()[0].split(','):
-                string = string.replace('\'', '')
-                if string:
-                    urls.append(string)
+        print('Searching script string')
+        pattern = r'var ytaw\s?=\[(.+)\];'
+        res = re.search(pattern, script_string)
+
+        for string in res.groups()[0].split(','):
+            string = string.replace('\'', '')
+            if string:
+                image_urls.append(string)
+        return image_urls

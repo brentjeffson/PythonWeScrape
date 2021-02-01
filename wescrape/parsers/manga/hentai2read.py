@@ -1,4 +1,5 @@
 from wescrape.parsers.mparse import MangaParser
+from wescrape.parsers.base import BaseParser
 from wescrape.models.base import Selectors, Patterns, Source
 import json
 
@@ -29,19 +30,30 @@ class Hentai2Read(MangaParser):
     def __init__(self, markup, parser='html.parser'):
         super().__init__(markup, self.SOURCE, parser)
 
-    def parse_chapter_images(self, soup):
-        selector = self.selector.chapter_image
+    @classmethod
+    def parse_chapter(cls, markup):
+        soup = BaseParser(markup).soup
+        image_urls = []
+        selector = cls.SOURCE.selectors.chapter_image
 
         selector, idx = selector.split(';')
         tags = soup.find_all(selector)
 
-        img_urls = json.loads(''.join(['{',
-                              tags[idx].string
-                              .replace('var gData = {', '')
-                              .replace('};', '')
-                              .replace('\\', '')
-                              .replace('\'', '"'),
-                              '}'
-                               ]))
+        if len(tags) == 0:
+            return image_urls
 
-        return img_urls
+        try:
+            
+            image_urls = json.loads(
+                ''.join(['{',
+                tags[idx].string
+                .replace('var gData = {', '')
+                .replace('};', '')
+                .replace('\\', '')
+                .replace('\'', '"'),
+                '}'
+            ]))
+        except Exception:
+            pass
+
+        return image_urls

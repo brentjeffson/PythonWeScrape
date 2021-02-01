@@ -1,4 +1,5 @@
 from wescrape.parsers.mparse import MangaParser
+from wescrape.parsers.base import BaseParser
 from wescrape.models.base import Selectors, Patterns, Source
 import re
 
@@ -32,11 +33,17 @@ class Fanfox(MangaParser):
     def __init__(self, markup, parser='html.parser'):
         super().__init__(markup, self.SOURCE, parser)
 
-    def parse_chapter_images(self, soup):
+    @classmethod
+    def parse_chapter(cls, markup):
+        soup = BaseParser(markup).soup
         image_urls = []
 
         pattern = r'\'(\|.+)\'\.split'
         parts = re.findall(pattern, str(soup))[0].split('|')
+
+        if len(parts) == 0:
+            return image_urls
+
         root_url = '/'.join([
             f'{parts[8]}.{parts[7]}.{parts[12]}',
             parts[11],
