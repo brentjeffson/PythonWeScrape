@@ -35,11 +35,11 @@ class WeScrape:
                     source_name = getattr(modules, source_name[0])
                 else:
                     source_name = source_module.capitalize()
-                
+
                 if source_name.lower() in root_url:
                     class_ = getattr(modules, source_name)
-                    return class_, media_type
-        return None, None
+                    break
+        return class_, media_type
 
     @staticmethod
     def from_html(html, parser='html.parser'):
@@ -50,3 +50,13 @@ class WeScrape:
 
         parser = class_(html, parser)
         return parser.parse()
+
+    @staticmethod
+    def parse_chapter(html, parser='html.parser'):
+        class_, _ = WeScrape.identify_parser(html)
+        if class_ is None:
+            print('Unsupported website...')
+            return None
+
+        soup = BaseParser(html, parser).soup
+        return class_.parse_chapter_images(soup)
