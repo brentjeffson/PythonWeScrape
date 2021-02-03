@@ -12,18 +12,25 @@ class BaseParser():
         self._links = []
 
     def _parse_web_url(self, soup):
-        meta_url_tag = soup.select_one('meta[property="og:url"]')
         web_url = ''
-        if meta_url_tag:
-            web_url = meta_url_tag['content']
-        else:
-            meta_url_tag = soup.select_one('meta[name="og:url"]')
+        selectors = [
+            'meta[property="og:url"]',
+            'meta[name="og:url"]',
+            'link[rel=canonical]'
+        ]
+
+        for selector in selectors:
+            meta_url_tag = soup.select_one(selector)
             if meta_url_tag:
-                web_url = meta_url_tag['content']
+                attr = 'content' if 'meta' in selector else 'href'
+                web_url = meta_url_tag[attr]
+                break 
+
         return web_url
 
     def _parse_web_title(self, soup):
-        web_title = soup.select_one('head > title').get_text()
+        web_title = soup.select_one('head > title')
+        print(web_title)
         return web_title if web_title else ''
 
     def _parse_web_links(self, soup):
