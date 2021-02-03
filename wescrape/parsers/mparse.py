@@ -37,14 +37,17 @@ class MangaParser(BaseParser):
         return title_tag.get_text() if title_tag else ''
 
     def _parse_alt_titles(self, soup, selector, splitter=''):
+        selector, splitter = self.split_selector(selector)
         alt_titles = super().parse_item_list(soup, selector, splitter)
         return alt_titles
 
     def _parse_authors(self, soup, selector, splitter=''):
+        selector, splitter = self.split_selector(selector)
         authors = super().parse_item_list(soup, selector, splitter)
         return authors
 
     def _parse_genres(self, soup, selector, splitter=''):
+        selector, splitter = self.split_selector(selector)
         genres = super().parse_item_list(soup, selector, splitter)
         return genres
 
