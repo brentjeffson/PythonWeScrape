@@ -13,13 +13,13 @@ class Hentai2Read(MangaParser):
         image_base_url='https://static.hentaicdn.com/hentai/',
         selectors=Selectors(
             title='h3.block-title > a',
-            thumbnail='div.img-container > a  > img',
+            thumbnail='div.img-container > a > img',
             authors='ul.list.list-simple-mini > li:nth-child(9)',
             genres='ul.list.list-simple-mini > li:nth-child(11)',
             description='p.detail-info-right-content',
             status='ul.list.list-simple-mini > li:nth-child(5)',
             chapter='ul.nav-chapters div.media > a',
-            chapter_image='script;2'
+            chapter_image='script::2'
         ),
         patterns=Patterns(
             index=r'[a-zA-Z.\s1-9]+[\s.]?[a-zA-Z]+[\s.]?([\d.]+)\s?\-?\s?[\w\d]+',
@@ -36,7 +36,7 @@ class Hentai2Read(MangaParser):
         image_urls = []
         selector = cls.SOURCE.selectors.chapter_image
 
-        selector, idx = selector.split(';')
+        selector, idx = selector.split('::')
         tags = soup.find_all(selector)
 
         if len(tags) == 0:
