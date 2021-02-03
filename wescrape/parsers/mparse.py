@@ -101,12 +101,20 @@ class MangaParser(BaseParser):
     def _parse_info(self, soup, alt_titles_sel, authors_sel, genres_sel, 
         rating_sel, description_sel, status_sel):
 
-        alt_titles = self._parse_alt_titles(soup, alt_titles_sel, ';')
-        authors = self._parse_authors(soup, authors_sel)
-        genres = self._parse_genres(soup, genres_sel)
-        rating = self._parse_rating(soup, rating_sel)
-        description = self._parse_description(soup, description_sel)
-        status = self._parse_status(soup, status_sel)
+        alt_titles, authors, genres, rating, description, status = [''] * 6
+
+        if alt_titles_sel:
+            alt_titles = self._parse_alt_titles(soup, alt_titles_sel)
+        if authors_sel:
+            authors = self._parse_authors(soup, authors_sel)
+        if genres_sel:
+            genres = self._parse_genres(soup, genres_sel)
+        if rating_sel:
+            rating = self._parse_rating(soup, rating_sel)
+        if description_sel:
+            description = self._parse_description(soup, description_sel)
+        if status_sel:
+            status = self._parse_status(soup, status_sel)
 
         return Info(
             alt_titles=alt_titles,
@@ -146,7 +154,9 @@ class MangaParser(BaseParser):
 
     def parse(self):
         url = self.web_url
-        thumbnail = self._parse_thumbnail(super().soup, self.selector.thumbnail)
+        thumbnail = ''
+        if self.selector.thumbnail:
+            thumbnail = self._parse_thumbnail(super().soup, self.selector.thumbnail)
         title = self._parse_title(super().soup, self.selector.title)
         info = self._parse_info( 
             super().soup,
