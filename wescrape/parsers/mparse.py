@@ -16,6 +16,16 @@ class MangaParser(BaseParser):
         self._selector = source.selectors
         self._pattern = source.patterns
     
+    @staticmethod
+    def split_selector(selector, splitter='::'):
+        parts = selector.split(splitter)
+        if len(parts) > 1:
+            splitter = parts[0]
+            selector = parts[1]
+        else:
+            splitter=''
+        return selector, splitter
+    
     def _parse_thumbnail(self, soup, selector):
         thumbnail_tag = soup.select_one(selector)
         if thumbnail_tag.name == 'img':
