@@ -31,7 +31,8 @@ class Hentai2Read(MangaParser):
         super().__init__(markup, self.SOURCE, parser)
 
     @classmethod
-    def parse_chapter(cls, markup):
+    def parse_chapter_images(cls, markup):
+        print(f'parse_chapter_images: {len(markup)}')
         soup = BaseParser(markup).soup
         image_urls = []
         selector = cls.SOURCE.selectors.chapter_image

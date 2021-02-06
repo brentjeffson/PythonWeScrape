@@ -33,7 +33,7 @@ class Mangakatana(MangaParser):
         super().__init__(markup, self.SOURCE, parser)
 
     @classmethod
-    def parse_chapter(cls, markup):
+    def parse_chapter_images(cls, markup):
         soup = BaseParser(markup).soup
         image_urls = []
         selector = cls.SOURCE.selectors.chapter_image
