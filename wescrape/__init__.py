@@ -52,11 +52,10 @@ class WeScrape:
         return parser.parse()
 
     @staticmethod
-    def parse_chapter(html, parser='html.parser'):
+    def parse_chapter_images(html, parser='html.parser'):
         class_, _ = WeScrape.identify_parser(html)
         if class_ is None:
             print('Unsupported website...')
             return None
 
-        soup = BaseParser(html, parser).soup
-        return class_.parse_chapter_images(soup)
+        return class_.parse_chapter_images(html)
