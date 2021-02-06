@@ -7,8 +7,8 @@ class BaseParser():
         self._markup = markup
         self._parser = parser
         self._soup = None
-        self._web_url = self._parse_web_url(self.soup)
-        self._web_title = self._parse_web_title(self.soup)
+        self._web_url = ''
+        self._web_title = ''
         self._links = []
 
     def _parse_web_url(self, soup):
@@ -21,16 +21,16 @@ class BaseParser():
 
         for selector in selectors:
             meta_url_tag = soup.select_one(selector)
+            
             if meta_url_tag:
                 attr = 'content' if 'meta' in selector else 'href'
                 web_url = meta_url_tag[attr]
-                break 
-
+                break
+        
         return web_url
 
     def _parse_web_title(self, soup):
         web_title = soup.select_one('head > title')
-        print(web_title)
         return web_title if web_title else ''
 
     def _parse_web_links(self, soup):
@@ -60,15 +60,19 @@ class BaseParser():
 
     @property
     def web_title(self):
+        if self._web_title == '':
+            self._web_title = self._parse_web_title(self.soup)
         return self._web_title
 
     @property
     def web_url(self):
+        if self._web_url == '':
+            self._web_url = self._parse_web_url(self.soup)
         return self._web_url
 
     @property
     def root_url(self):
-        web_url = self._web_url
+        web_url = self.web_url
         if web_url:
             web_url_parts = web_url.split('/')
             if len(web_url_parts) >= 3:
@@ -81,6 +85,6 @@ class BaseParser():
 
     @property
     def soup(self):
-        if not self._soup:
+        if self._soup is None or type(self._soup) != BeautifulSoup:
             self._soup = BeautifulSoup(self._markup, self._parser)
         return self._soup
