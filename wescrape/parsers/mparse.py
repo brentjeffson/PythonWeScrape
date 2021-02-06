@@ -174,9 +174,9 @@ class MangaParser(BaseParser):
             index_pattern=self.pattern.index,
             upload_date_pattern=self.pattern.upload_date
         )
-        return Manga(url=url, thumbnail_url=thumbnail, title=title, info=info, chapters=chapters)
+        return Manga(url=url, thumbnail_url=thumbnail, title=title, info=info, chapters=chapters) 
 
-    def parse_chapter(self, markup):
+    def parse_chapter_images(self, markup):
         soup = BaseParser(markup).soup
         img_urls = []
         chapter_tags = soup.select(self.selector.chapter_image)
