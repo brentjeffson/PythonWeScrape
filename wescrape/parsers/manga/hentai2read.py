@@ -32,29 +32,29 @@ class Hentai2Read(MangaParser):
 
     @classmethod
     def parse_chapter_images(cls, markup):
-        print(f'parse_chapter_images: {len(markup)}')
         soup = BaseParser(markup).soup
         image_urls = []
         selector = cls.SOURCE.selectors.chapter_image
 
         selector, idx = selector.split('::')
         tags = soup.find_all(selector)
-
+        
         if len(tags) == 0:
             return image_urls
 
         try:
-            
-            image_urls = json.loads(
+            json_obj = json.loads(
                 ''.join(['{',
-                tags[idx].string
-                .replace('var gData = {', '')
-                .replace('};', '')
-                .replace('\\', '')
-                .replace('\'', '"'),
-                '}'
+                    tags[int(idx)].string
+                    .replace('var gData = {', '')
+                    .replace('};', '')
+                    .replace('\\', '')
+                    .replace('\'', '"'),
+                    '}'
             ]))
-        except Exception:
+            image_urls = json_obj['images']
+        except Exception as e:
+            print(e)
             pass
 
         return image_urls
