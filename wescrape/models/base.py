@@ -62,7 +62,7 @@ class Chapter:
     index: int
     timestamp: float = 0
     content: str = ''
-    # image_urls: List = field(default_factory=[''])
+    image_urls: List = field(default_factory=list)
 
 
 @dataclass
