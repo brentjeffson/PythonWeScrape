@@ -31,7 +31,7 @@ class BaseParser():
 
     def _parse_web_title(self, soup):
         web_title = soup.select_one('head > title')
-        return web_title if web_title else ''
+        return web_title.get_text() if web_title else ''
 
     def _parse_web_links(self, soup):
         web_link_tags = soup.select('a')
