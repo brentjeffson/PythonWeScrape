@@ -63,7 +63,7 @@ class MangaParser(BaseParser):
         rating_tag = None
         if selector:
             rating_tag = soup.select_one(selector)
-        return rating_tag.get_text().strip() if rating_tag else -1
+        return rating_tag.get_text().strip() if rating_tag else ''
 
     def _parse_description(self, soup, selector, splitter=''):
         description = super().parse_item_list(soup, selector, splitter)
@@ -123,7 +123,7 @@ class MangaParser(BaseParser):
             description = self._parse_description(soup, description_sel)
         if status_sel:
             status = self._parse_status(soup, status_sel)
-
+        
         return Info(
             alt_titles=alt_titles,
             authors=authors,
