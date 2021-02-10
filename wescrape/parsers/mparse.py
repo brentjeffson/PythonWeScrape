@@ -25,6 +25,12 @@ class MangaParser(BaseParser):
         else:
             splitter=''
         return selector, splitter
+
+    def _parse_elements(self, soup, selector, splitter=''):
+        selector, splitter = self.split_selector(selector)
+        elements = super().parse_item_list(soup, selector, splitter)
+        elements = [ element.strip() for element in elements ]
+        return elements
     
     def _parse_thumbnail(self, soup, selector):
         thumbnail_tag = soup.select_one(selector)
@@ -37,22 +43,13 @@ class MangaParser(BaseParser):
         return title_tag.get_text().strip() if title_tag else ''
 
     def _parse_alt_titles(self, soup, selector, splitter=''):
-        selector, splitter = self.split_selector(selector)
-        alt_titles = super().parse_item_list(soup, selector, splitter)
-        alt_titles = [ title.strip() for title in alt_titles ]
-        return alt_titles
+        return self._parse_elements(soup, selector, splitter)
 
     def _parse_authors(self, soup, selector, splitter=''):
-        selector, splitter = self.split_selector(selector)
-        authors = super().parse_item_list(soup, selector, splitter)
-        authors = [ author.strip() for author in authors ]
-        return authors
+        return self._parse_elements(soup, selector, splitter)
 
     def _parse_genres(self, soup, selector, splitter=''):
-        selector, splitter = self.split_selector(selector)
-        genres = super().parse_item_list(soup, selector, splitter)
-        genres = [ genre.strip() for genre in genres ]
-        return genres
+        return self._parse_elements(soup, selector, splitter)
 
     def _parse_rating(self, soup, selector):
         rating_tag = None
