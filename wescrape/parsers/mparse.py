@@ -68,10 +68,8 @@ class MangaParser(BaseParser):
     def _parse_description(self, soup, selector, splitter=''):
         description = super().parse_item_list(soup, selector, splitter)
         if type(description) == list and len(description) > 1:
-            description = '\n'.join(description)
-        else:
-            description = ''
-        return description.strip()
+            description = '\n'.join(description.strip())
+        return description
 
     def _parse_status(self, soup, selector):
         status_tag = soup.select_one(selector)
