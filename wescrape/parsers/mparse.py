@@ -34,43 +34,48 @@ class MangaParser(BaseParser):
 
     def _parse_title(self, soup, selector):
         title_tag = soup.select_one(selector)
-        return title_tag.get_text() if title_tag else ''
+        return title_tag.get_text().strip() if title_tag else ''
 
     def _parse_alt_titles(self, soup, selector, splitter=''):
         selector, splitter = self.split_selector(selector)
         alt_titles = super().parse_item_list(soup, selector, splitter)
+        alt_titles = [ title.strip() for title in alt_titles ]
         return alt_titles
 
     def _parse_authors(self, soup, selector, splitter=''):
         selector, splitter = self.split_selector(selector)
         authors = super().parse_item_list(soup, selector, splitter)
+        authors = [ author.strip() for author in authors ]
         return authors
 
     def _parse_genres(self, soup, selector, splitter=''):
         selector, splitter = self.split_selector(selector)
         genres = super().parse_item_list(soup, selector, splitter)
+        genres = [ genre.strip() for genre in genres ]
         return genres
 
     def _parse_rating(self, soup, selector):
         rating_tag = None
         if selector:
             rating_tag = soup.select_one(selector)
-        return rating_tag.get_text() if rating_tag else -1
+        return rating_tag.get_text().strip() if rating_tag else -1
 
     def _parse_description(self, soup, selector, splitter=''):
         description = super().parse_item_list(soup, selector, splitter)
         if type(description) == list and len(description) > 1:
             description = '\n'.join(description)
-        return description
+        else:
+            description = ''
+        return description.strip()
 
     def _parse_status(self, soup, selector):
         status_tag = soup.select_one(selector)
-        status = status_tag.get_text() if status_tag else None
+        status = status_tag.get_text() if status_tag else ''
         for s in Status:
             if status == s.value:
                 status = s
                 break
-        return status
+        return status.strip()
 
     def _parse_chapter_timestamps(self, soup, upload_date_sel, upload_date_pattern):
         months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
