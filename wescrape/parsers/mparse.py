@@ -2,7 +2,7 @@ import re
 import datetime
 
 from wescrape.parsers.base import BaseParser
-from wescrape.models.base import Status, Info, Chapter, Manga
+from wescrape.models.base import Status, Info, Chapter, Manga, SPLITTERS
 
 
 class MangaParser(BaseParser):
@@ -28,7 +28,15 @@ class MangaParser(BaseParser):
 
     def _parse_elements(self, soup, selector, splitter=''):
         selector, splitter = self.split_selector(selector)
-        elements = super().parse_item_list(soup, selector, splitter)
+
+        if splitter == '':
+            for splitter in SPLITTERS:
+                elements = self.parse_item_list(soup, selector, splitter)
+                if len(elements) > 0:
+                    break
+        else:
+            elements = self.parse_item_list(soup, selector, splitter)
+
         elements = [ element.strip() for element in elements ]
         return elements
     
