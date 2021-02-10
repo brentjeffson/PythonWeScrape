@@ -53,9 +53,9 @@ class BaseParser():
         if item_tags and len(item_tags) == 1 and splitter:
             item_text = item_tags[0].get_text()
             item_parts = item_text.split(splitter)
-            items = [item.strip() for item in item_parts]
+            items = [ item.strip() for item in item_parts ]
         else:
-            items = [item_tags.get_text() for item_tags in item_tags]
+            items = [ item_tag.get_text() for item_tag in item_tags ]
         return items
 
     @property
