@@ -2,6 +2,8 @@ from enum import Enum
 from typing import List
 from dataclasses import dataclass, field
 
+SPLITTERS = [';', ',', ':']
+
 
 class MediaType(Enum):
     MANGA = 0
